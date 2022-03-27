@@ -1,11 +1,5 @@
-//const {Engine,Composite,Render,World,Bodies,Body,Detector,Constraint,Runner} = Matter;
-
-//document.addEventListener("keydown", function(a){
-//	alert("key down !");
-	//Body.rotate(bot.body, 0.1, Vector.create(bot.bodyX, bot.bodyY));
-//});
-
 var keydown = false;//added user control (for now to verify things work)
+var numBots = 5; //number of bots to spawn
 
 // create engine
 var engine = Engine.create(),
@@ -18,28 +12,31 @@ var render = Render.create({
 		options: {
 				width: 800,
 				height: 600,
-				showVelocity: true
+				showVelocity: false
 		}
 });
 
-Render.run(render);
+Render.run(render); //automatically renders for us :D
 
 // create runner
 var runner = Runner.create();
 Runner.run(runner, engine);
 
-//make a bot!
-var bot = new Bot();
-//var bot2 = new Bot();
-console.log(bot.model.getWeights());
+//make a bots
+var bots = []
+
+for(var i = 0; i < numBots; i++){
+	bots.push(new Bot());
+}
+
 var ground = Bodies.rectangle(400, 600, 800, 100, {isStatic:true});
 
 //add things to the world
 Composite.add(world, [ground]);
-//console.log(bot.getParts());
 
-Composite.add(world, [bot.body, bot.thigh, bot.shin, bot.bodyToThigh, bot.thighToShin]);
-//Composite.add(world, [bot2.body, bot2.thigh, bot2.shin, bot2.bodyToThigh, bot2.thighToShin]);
+for(var i = 0; i < numBots; i++){
+	Composite.add(world, [bots[i].body, bots[i].thigh, bots[i].shin, bots[i].bodyToThigh, bots[i].thighToShin]);
+}
 
 // fit the render viewport to the scene
 Render.lookAt(render, {
@@ -48,7 +45,7 @@ Render.lookAt(render, {
 });
 
 var tickNum = 0;
-var cur_action = bot.action(false);
+//var cur_action = bot.action(false);
 
 var ticksPerAction = 50; //in how many ticks does the bot take one action
 
@@ -59,7 +56,8 @@ Events.on(runner, "afterTick", function(){
 	//Body.rotate(bot.shin, cur_action[1]/ticksPerAction);
 	
 	if(tickNum % ticksPerAction == 0){
-		cur_action = bot.action(true);
-		//console.log(cur_action);
+		for(var i = 0; i < numBots; i++){
+			bots[i].action(true);
+		}
 	}
 });

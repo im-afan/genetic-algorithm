@@ -112,9 +112,19 @@ class Bot{
 	makeChildren(mutationAmount){
 		var mutation = tf.randomUniform(this.model.getWeights.shape, -mutationAmount, mutationAmount); //mutations in the shape of model weights, with random minimum -mutationAmount and maximum mutationAmount
 
-		var newModel 
+		var newWeights = this.model.getWeights.add(mutation); // weights of child
 
-		return 
+		var newModel = tf.sequential();
+		
+		newModel.add(tf.layers.dense({ //no hidden layers
+			units: 2, //rotation of thigh, rotation of shin
+			activation: 'tanh',
+			inputDim: 6 //current x, current y, x velocity, y velocity, thigh angle, shin angle
+		}));
+
+		newModel.setWeights(newWeights);
+
+		return newModel;
 	}
 }
 
