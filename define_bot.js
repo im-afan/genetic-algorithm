@@ -4,7 +4,7 @@ const {Engine,Composite,Render,World,Bodies,Body,Detector,Constraint,Runner, Vec
 //const ctx = canvas.getContext("2d");
 
 class Bot{
-	constructor(){
+	constructor(size){
 		var params = {
 			collisionFilter: { //allow bot to collide with itself (the engine breaks if we allow self-collisions lol)
 				category: 2,
@@ -15,7 +15,7 @@ class Bot{
 			frictionAir: 0,
 			restitution: 0.5, //bounciness
 		}
-
+		this.size = size;
 		//just for creation, just use this.body.position to get live positioning
 		
 		this.x = 400;
@@ -26,22 +26,22 @@ class Bot{
 		this.bodyY = this.y
 
 		this.thighX = this.x;
-		this.thighY = this.y+100;
+		this.thighY = this.y+100*size;
 
 		this.shinX = this.x;
-		this.shinY = this.y+200;
+		this.shinY = this.y+200*size;
 
 		//bones
-		this.body = Bodies.rectangle(this.bodyX, this.bodyY, 100, 100, params);
-		this.thigh = Bodies.rectangle(this.thighX, this.thighY+100, 50, 100, params); 
-		this.shin = Bodies.rectangle(this.thighX, this.thighY+200, 50, 100, params);
+		this.body = Bodies.rectangle(this.bodyX, this.bodyY, 100*size, 100*size, params);
+		this.thigh = Bodies.rectangle(this.thighX, this.thighY+100*size, 50*size, 100*size, params); 
+		this.shin = Bodies.rectangle(this.thighX, this.thighY+200*size, 50*size, 100*size, params);
 
 		//joints
 		this.bodyToThigh = Constraint.create({
 			bodyA: this.body,
 			bodyB: this.thigh, 
-			pointA: Matter.Vector.create(0, 50),
-			pointB: Matter.Vector.create(0, -50),
+			pointA: Matter.Vector.create(0, 50*size),
+			pointB: Matter.Vector.create(0, -50*size),
 			stiffness:1,
 			length:0,
 			damping:0.1
@@ -50,8 +50,8 @@ class Bot{
 		this.thighToShin = Constraint.create({
 			bodyA: this.thigh,
 			bodyB: this.shin, 
-			pointA: Vector.create(0,50),
-			pointB: Vector.create(0,-50),
+			pointA: Vector.create(0,50*size),
+			pointB: Vector.create(0,-50*size),
 			stiffness:1,
 			length:0,
 			damping:0.1
@@ -92,13 +92,15 @@ class Bot{
 		var velocity = Vector.create(this.body.velocity.x, this.body.velocity.y); //make a copy of velocity vector
 		Vector.normalise(velocity); //this makes it so that the vector only shows the direction
 
-//console.log([this.body.position.x/800, this.body.position.y/600, velocity.x, velocity.y, Math.cos(this.thigh.angle), Math.cos(this.shin.angle)])
+		//console.log([this.body.position.x/800, this.body.position.y/600, velocity.x, velocity.y, Math.cos(this.thigh.angle), Math.cos(this.shin.angle)])
 		
 		var input = tf.tensor([[this.body.position.x/800, this.body.position.y/600, velocity.x, velocity.y, Math.cos(this.thigh.angle), Math.cos(this.shin.angle)]]);
-		
+		//input.print();
 		var action = this.model.predict(input); //get model prediction of the best action
 
 		var action_array = action.arraySync()[0]; // turn action (a tf.tensor) into an array
+		console.log("action array");
+		console.log(action_array);
 
 		//do actions
 		if(doActions){ //doActions tells us whether to do the predicted actions immediately or just return them
@@ -109,12 +111,15 @@ class Bot{
 		return action_array[0];
 	}
 
-	makeChildren(mutationAmount){
-		var mutation = tf.randomUniform(this.model.getWeights.shape, -mutationAmount, mutationAmount); //mutations in the shape of model weights, with random minimum -mutationAmount and maximum mutationAmount
-
-		var newWeights = this.model.getWeights.add(mutation); // weights of child
-
+	makeChild(mutationAmount){
+		//console.log(this.model.getWeights());
+		var mutation = tf.randomUniform(this.model.getWeights()[0].shape, -mutationAmount, mutationAmount); //mutations in the shape of model weights, with random minimum -mutationAmount and maximum mutationAmount
+		//console.log(mutation);
+		var newWeights = this.model.getWeights()[0].add(mutation); // weights of child
+		//console.log(newWeights);
 		var newModel = tf.sequential();
+
+		//console.log(newModel);
 		
 		newModel.add(tf.layers.dense({ //no hidden layers
 			units: 2, //rotation of thigh, rotation of shin
@@ -122,7 +127,8 @@ class Bot{
 			inputDim: 6 //current x, current y, x velocity, y velocity, thigh angle, shin angle
 		}));
 
-		newModel.setWeights(newWeights);
+		newModel.setWeights([newWeights, this.model.getWeights()[1]]);
+		//console.log(newModel)
 
 		return newModel;
 	}
