@@ -99,8 +99,8 @@ class Bot{
 		var action = this.model.predict(input); //get model prediction of the best action
 
 		var action_array = action.arraySync()[0]; // turn action (a tf.tensor) into an array
-		console.log("action array");
-		console.log(action_array);
+		//console.log("action array");
+		///console.log(action_array);
 
 		//do actions
 		if(doActions){ //doActions tells us whether to do the predicted actions immediately or just return them

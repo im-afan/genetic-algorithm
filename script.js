@@ -1,9 +1,13 @@
 var keydown = false;//added user control (for now to verify things work)
-var numBots = 1; //number of bots to spawn
-var generationTicks = 200; //number of ticks per generation
+var numBots = 20; //number of bots to spawn
+var generationTicks = 1000; //number of ticks per generation
 var reproduceAmount = numBots/2; //amount of bots chosen to reproduce
-var reproduceChance = 0.5; //reproduceAmount = reproduceChance*numBots
+var reproduceChance = 1; //reproduceAmount = reproduceChance*numBots
 var botSize = 0.5; //size of the bot on screen
+
+function sigmoid(x){
+	return 1/(1+Math.exp(-x+numBots/2));
+}
 
 // create engine
 var engine = Engine.create(),
@@ -58,8 +62,8 @@ Events.on(runner, "afterTick", function(){
 	
 	if(tickNum % ticksPerAction == 0){ //make bots move every ticksPerAction ticks
 		for(var i = 0; i < numBots; i++){
-			console.log("action!");
-			console.log(bots[i].body.position)
+			//console.log("action!");
+			//console.log(bots[i].body.position)
 			bots[i].action(true);
 		}
 	}
@@ -70,16 +74,17 @@ Events.on(runner, "afterTick", function(){
 			return botB.body.position.x > botA.body.position.x; //sort bots by distance travelled (fitness function)
 		});
 
+		var botslength = bots.length
+		
 		var newGeneration = [];
 		
-		for(var i = 0; i < bots.length; i++){ //choose bots to reproduce; the better the bot, the more likely it will reproduce
-			if(Math.random() < reproduceChance){
-				//console.log("aaaa");
+		for(var i = 0; i < botslength; i++){ //choose bots to reproduce; the better the bot, the more likely it will reproduce
+			console.log(sigmoid(i));
+			if(Math.random() > sigmoid(i)){
+				console.log("BRUV");
 				var child_model = bots[i].makeChild(0.1);
-				//console.log(child_model);
 				var childBot = new Bot(botSize);
 				childBot.model = child_model;
-				console.log("child position");
 				console.log(childBot.body.position);
 				
 				newGeneration.push(childBot)
@@ -87,20 +92,25 @@ Events.on(runner, "afterTick", function(){
 				//console.log(childBot.body.position);
 			}
 		}
+		console.log("new generation length: (# that survived)");
+		console.log(newGeneration.length);
+		console.log(numBots-newGeneration.length);
 
-		for(var i = 0; i < numBots-newGeneration.length; i++){ //introduce new bots to environment
+		var a = newGeneration.length;
+
+		for(var i = 0; i <= numBots-a; i++){ //introduce new bots to environment
+			console.log("??");
 			newGeneration.push(new Bot(botSize));
 		}
 
-		for(var i = 0; i < bots.length; i++){
-			Composite.remove(world, [bots[i].body, bots[i].thigh, bots[i].shin, bots[i].bodyToThigh, bots[i].thighToShin]);
-		}
+		Composite.clear(world, true);
 		
 		//console.log(newGeneration);
 		bots = newGeneration;
+		console.log(bots.length);
 		//console.log(bots);
 
-		for(var i = 0; i < numBots; i++){
+		for(var i = 0; i < bots.length; i++){
 			Composite.add(world, [bots[i].body, bots[i].thigh, bots[i].shin, bots[i].bodyToThigh, bots[i].thighToShin]);
 		}
 	}
