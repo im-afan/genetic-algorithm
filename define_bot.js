@@ -114,9 +114,12 @@ class Bot{
 	makeChild(mutationAmount){
 		//console.log(this.model.getWeights());
 		var mutation = tf.randomUniform(this.model.getWeights()[0].shape, -mutationAmount, mutationAmount); //mutations in the shape of model weights, with random minimum -mutationAmount and maximum mutationAmount
+		var mutation_bias = tf.randomUniform(this.model.getWeights()[0].shape, -mutationAmount, mutationAmount); //mutation for bias of neural network
+		
 		//console.log(mutation);
 		var newWeights = this.model.getWeights()[0].add(mutation); // weights of child
 		//console.log(newWeights);
+		var newBias = this.model.getWeights[1].add(mutation_bias)
 		var newModel = tf.sequential();
 
 		//console.log(newModel);
@@ -127,7 +130,7 @@ class Bot{
 			inputDim: 6 //current x, current y, x velocity, y velocity, thigh angle, shin angle
 		}));
 
-		newModel.setWeights([newWeights, this.model.getWeights()[1]]);
+		newModel.setWeights([newWeights, newBias]);
 		//console.log(newModel)
 
 		return newModel;
