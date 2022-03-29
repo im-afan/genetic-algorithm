@@ -9,7 +9,7 @@ var reproduceChance = 0.5; //reproduceAmount = reproduceChance*numBots
 
 var botSize = 0.2; //size of the bot on screen
 
-function sigmoid(x){
+function sigmoid(x){ //not being used atm
 	return 1/(1+Math.exp(-x+numBots*reproduceChance));
 }
 

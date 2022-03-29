@@ -44,7 +44,11 @@ class Bot{
 			pointB: Matter.Vector.create(0, -50*size),
 			stiffness:1,
 			length:0,
-			damping:0.1
+			damping:0.1,
+			render:{
+				anchors:false,
+				lineWidth:0
+			}
 		});
 
 		this.thighToShin = Constraint.create({
@@ -54,7 +58,11 @@ class Bot{
 			pointB: Vector.create(0,-50*size),
 			stiffness:1,
 			length:0,
-			damping:0.1
+			damping:0.1,
+			render:{
+				anchors:false,
+				lineWidth:0
+			}
 		});
 
 		//ML
