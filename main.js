@@ -1,6 +1,6 @@
 var keydown = false;//added user control (for now to verify things work)
 var numBots = 20; //number of bots to spawn
-var generationTicks = 1000; //number of ticks per generation
+var generationTicks = 500; //number of ticks per generation
 
 //these two variables (reproduceAmount and reproduceChance) arent used yet btw
 var reproduceAmount = numBots/2; //amount of bots chosen to reproduce
