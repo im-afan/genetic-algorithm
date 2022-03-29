@@ -41,7 +41,7 @@ for(var i = 0; i < numBots; i++){
 	bots.push(new Bot(botSize));
 }
 
-var ground = Bodies.rectangle(400, 600, 1600, 100, {isStatic:true});
+var ground = Bodies.rectangle(400, 600, 1600, 100, {isStatic:true, friction:0.001});
 
 //add things to the world
 Composite.add(world, [ground]);
@@ -66,8 +66,6 @@ Events.on(runner, "afterTick", function(){
 	
 	if(tickNum % ticksPerAction == 0){ //make bots move every ticksPerAction ticks
 		for(var i = 0; i < numBots; i++){
-			//console.log("action!");
-			//console.log(bots[i].body.position)
 			bots[i].action(true);
 		}
 	}
@@ -87,13 +85,13 @@ Events.on(runner, "afterTick", function(){
 		
 		for(var i = 0; i < botslength/2; i++){ //choose bots to reproduce; the better the bot, the more likely it will reproduce
 			//if(Math.random() > sigmoid(i)){
-				var child_model = bots[i].makeChild(0.1); //every bot above 50th percentile makes 2 children
+				var child_model = bots[i].makeChild(0.3); //every bot above 50th percentile makes 2 children
 				var childBot = new Bot(botSize);
 				childBot.model = child_model;
 				
 				newGeneration.push(childBot);
 			
-				var child_model = bots[i].makeChild(0.02);
+				var child_model = bots[i].makeChild(0.3);
 				var childBot = new Bot(botSize);
 				childBot.model = child_model;
 				
@@ -101,13 +99,10 @@ Events.on(runner, "afterTick", function(){
 
 			//}
 		}
-		console.log("new generation length: (# that survived)");
-		console.log(newGeneration.length);
-		console.log(numBots-newGeneration.length);
 
 		var a = newGeneration.length;
 
-		for(var i = 0; i <= numBots-a; i++){ //introduce new bots to environment
+		for(var i = 0; i <= numBots-a; i++){ //introduce new bots to environment (not using this atm)
 			newGeneration.push(new Bot(botSize));
 		}
 

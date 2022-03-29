@@ -18,7 +18,7 @@ class Bot{
 		this.size = size;
 		//just for creation, just use this.body.position to get live positioning
 		
-		this.x = 600;
+		this.x = 100;
 		this.y = 100;
 
 		//locations for each bone (also just for creation)
@@ -63,7 +63,7 @@ class Bot{
 		this.model.add(tf.layers.dense({ //no hidden layers
 			units: 2, //rotation of thigh, rotation of shin
 			activation: 'tanh',
-			inputDim: 6 //current x, current y, x velocity, y velocity, thigh angle, shin angle
+			inputDim: 4 //x velocity, y velocity, thigh angle, shin angle
 		}));
 	}
 
@@ -94,7 +94,7 @@ class Bot{
 
 		//console.log([this.body.position.x/800, this.body.position.y/600, velocity.x, velocity.y, Math.cos(this.thigh.angle), Math.cos(this.shin.angle)])
 		
-		var input = tf.tensor([[this.body.position.x/800, this.body.position.y/600, velocity.x, velocity.y, Math.cos(this.thigh.angle), Math.cos(this.shin.angle)]]);
+		var input = tf.tensor([[velocity.x, velocity.y, Math.cos(this.thigh.angle), Math.cos(this.shin.angle)]]);
 		//input.print();
 		var action = this.model.predict(input); //get model prediction of the best action
 
@@ -104,8 +104,8 @@ class Bot{
 
 		//do actions
 		if(doActions){ //doActions tells us whether to do the predicted actions immediately or just return them
-			Body.rotate(this.thigh, action_array[0]);
-			Body.rotate(this.shin, action_array[1]);
+			Body.setAngularVelocity(this.thigh, action_array[0]);
+			Body.setAngularVelocity(this.shin, action_array[1]);
 		}
 		//console.log(action_array);
 		return action_array[0];
@@ -127,7 +127,7 @@ class Bot{
 		newModel.add(tf.layers.dense({ //no hidden layers
 			units: 2, //rotation of thigh, rotation of shin
 			activation: 'tanh',
-			inputDim: 6 //current x, current y, x velocity, y velocity, thigh angle, shin angle
+			inputDim: 4 //x velocity, y velocity, thigh angle, shin angle
 		}));
 
 		newModel.setWeights([newWeights, newBias]);
