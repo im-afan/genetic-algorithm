@@ -65,7 +65,7 @@ Events.on(runner, "afterTick", function(){
 	tickNum++;
 	
 	if(tickNum % ticksPerAction == 0){ //make bots move every ticksPerAction ticks
-		for(var i = 0; i < numBots; i++){
+		for(var i = 0; i < bots.length; i++){
 			bots[i].action(true);
 		}
 	}
